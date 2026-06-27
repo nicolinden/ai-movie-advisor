@@ -1,5 +1,5 @@
-import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { inject, Injectable, isDevMode } from '@angular/core';
 import { Observable } from 'rxjs';
 
 export interface MovieSearchResult {
@@ -22,9 +22,13 @@ interface MovieSearchResponse {
 export class MovieService {
   private readonly http = inject(HttpClient);
 
+  private readonly apiBaseUrl = isDevMode()
+    ? 'http://localhost:3000/api'
+    : '/api';
+
   searchMovies(query: string): Observable<MovieSearchResponse> {
     return this.http.get<MovieSearchResponse>(
-      `http://localhost:3000/api/movies/search?query=${encodeURIComponent(query)}`
+      `${this.apiBaseUrl}/movies/search?query=${encodeURIComponent(query)}`
     );
   }
 }
