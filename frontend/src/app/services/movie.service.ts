@@ -1,20 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, isDevMode } from '@angular/core';
 import { Observable } from 'rxjs';
-
-export interface MovieSearchResult {
-  id: number;
-  title: string;
-  releaseDate: string;
-  rating: number;
-  posterUrl: string | null;
-  overview: string;
-}
-
-interface MovieSearchResponse {
-  query: string;
-  results: MovieSearchResult[];
-}
+import { MovieSearchResponse } from '../models/movie.model';
 
 @Injectable({
   providedIn: 'root',

@@ -1,6 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { MovieService, MovieSearchResult } from './services/movie';
-
+import { MovieService } from './services/movie.service';
 
 @Component({
   selector: 'app-root',
