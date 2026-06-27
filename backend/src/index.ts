@@ -3,10 +3,9 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
-import { createMovieAnalysisPrompt } from './services/movie-analysis.prompt.js';
+
+import { createMovieAnalysisPrompt } from './prompts/movie-analysis.prompt.js';
 import { executeJsonPrompt } from './services/openai.service.js';
-import { error } from 'node:console';
-import { title } from 'node:process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -59,7 +58,7 @@ app.get('/api/movies/search', async (req, res) => {
         });
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
 
     const movies = data.results.map((movie: any) => ({
         id: movie.id,
@@ -94,7 +93,7 @@ app.get('/api/movies/:id', async (req, res) => {
     const response = await fetch(url, {
         headers: {
             Authorization: `Bearer ${token}`,
-            accept: 'application/json'
+            accept: 'application/json',
         },
     });
 
@@ -107,9 +106,10 @@ app.get('/api/movies/:id', async (req, res) => {
             body: errorBody,
         });
 
-        return res.status(response.status).json({
-            error: 'TMDb movie detail request failed',
-            status: response.status,
+        return res.status(502).json({
+            error: 'Movie provider failed',
+            provider: 'TMDb',
+            providerStatus: response.status,
         });
     }
 
@@ -129,22 +129,8 @@ app.get('/api/movies/:id', async (req, res) => {
         overview: movie.overview,
         runtime: movie.runtime ?? null,
         genres: movie.genres?.map((genre: any) => genre.name) ?? [],
-    })
-});
-
-/*
- * Alleen gebruiken in productie.
- * Tijdens development draait Angular via ng serve.
- */
-if (process.env.NODE_ENV === 'production') {
-    const frontendPath = path.join(__dirname, '../public');
-
-    app.use(express.static(frontendPath));
-
-    app.use((_req, res) => {
-        res.sendFile(path.join(frontendPath, 'index.html'));
     });
-}
+});
 
 app.post('/api/movies/:id/analyze', async (req, res) => {
     try {
@@ -168,6 +154,14 @@ app.post('/api/movies/:id/analyze', async (req, res) => {
         });
 
         if (!response.ok) {
+            const errorBody = await response.text();
+
+            console.error('TMDb movie detail request failed for analysis', {
+                movieId,
+                status: response.status,
+                body: errorBody,
+            });
+
             return res.status(502).json({
                 error: 'Movie provider failed',
                 provider: 'TMDb',
@@ -204,7 +198,22 @@ app.post('/api/movies/:id/analyze', async (req, res) => {
             error: 'Movie analysis failed',
         });
     }
-})
+});
+
+/*
+ * Alleen gebruiken in productie.
+ * Tijdens development draait Angular via ng serve.
+ * Belangrijk: deze fallback moet altijd NA alle /api routes staan.
+ */
+if (process.env.NODE_ENV === 'production') {
+    const frontendPath = path.join(__dirname, '../public');
+
+    app.use(express.static(frontendPath));
+
+    app.use((_req, res) => {
+        res.sendFile(path.join(frontendPath, 'index.html'));
+    });
+}
 
 app.listen(port, () => {
     console.log(`Backend running on http://localhost:${port}`);
