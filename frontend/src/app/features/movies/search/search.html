@@ -1,0 +1,35 @@
+<h1>AI Movie Advisor</h1>
+
+<p>Find your next movie with AI.</p>
+
+<input
+  type="text"
+  placeholder="Search for a movie..."
+  [value]="searchQuery()"
+  (input)="searchQuery.set($any($event.target).value)"
+  (keydown.enter)="searchMovies()"
+/>
+
+<button type="button" (click)="searchMovies()" [disabled]="isLoading()">
+  {{ isLoading() ? 'Searching...' : 'Search' }}
+</button>
+
+@if (errorMessage()) {
+  <p class="error">{{ errorMessage() }}</p>
+}
+
+<ul>
+  @for (movie of movies(); track movie.id) {
+    <li>
+      @if (movie.posterUrl) {
+        <img [src]="movie.posterUrl" [alt]="movie.title" />
+      }
+
+      <div>
+        <h2>{{ movie.title }}</h2>
+        <p>{{ movie.releaseDate }} · ⭐ {{ movie.rating }}</p>
+        <p>{{ movie.overview }}</p>
+      </div>
+    </li>
+  }
+</ul>

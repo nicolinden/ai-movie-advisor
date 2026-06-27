@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, isDevMode } from '@angular/core';
 import { Observable } from 'rxjs';
-import { MovieSearchResponse } from '../models/movie.model';
+import { MovieSearchResponse, MovieDetail } from '../models/movie.model';
 
 @Injectable({
   providedIn: 'root',
@@ -18,4 +18,11 @@ export class MovieService {
       `${this.apiBaseUrl}/movies/search?query=${encodeURIComponent(query)}`
     );
   }
+
+  getMovieDetail(id: number): Observable<MovieDetail> {
+    return this.http.get<MovieDetail>(
+      `${this.apiBaseUrl}/movies/${id}`
+    );
+  }
+
 }

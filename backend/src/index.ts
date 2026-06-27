@@ -3,6 +3,8 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
+import { error } from 'node:console';
+import { title } from 'node:process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -72,6 +74,51 @@ app.get('/api/movies/search', async (req, res) => {
         query,
         results: movies,
     });
+});
+
+app.get('/api/movies/:id', async (req, res) => {
+    const movieId = req.params.id;
+    const token = process.env.TMDB_ACCESS_TOKEN;
+
+    if (!token) {
+        return res.status(500).json({
+            error: 'TMDB_ACCESS_TOKEN is not configured',
+        });
+    }
+
+    const url = new URL(`https://api.themoviedb.org/3/movie/${movieId}`);
+    url.searchParams.set('language', 'en-US');
+
+    const response = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            accept: 'application/json'
+        },
+    });
+
+    if (!response.ok) {
+        return res.status(response.status).json({
+            error: 'TMDb movie detail request failed',
+        });
+    }
+
+    const movie: any = await response.json();
+
+    res.json({
+        id: movie.id,
+        title: movie.title,
+        releaseDate: movie.release_date,
+        rating: movie.vote_average,
+        posterUrl: movie.poster_path
+            ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
+            : null,
+        backdropUrl: movie.backdrop_path
+            ? `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`
+            : null,
+        overview: movie.overview,
+        runtime: movie.runtime ?? null,
+        genres: movie.genres?.map((genre: any) => genre.name) ?? [],
+    })
 });
 
 /*
