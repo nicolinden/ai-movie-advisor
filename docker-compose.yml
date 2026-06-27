@@ -1,0 +1,13 @@
+services:
+  ai-movie-advisor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-movie-advisor
+    ports:
+      - "8086:3000"
+    environment:
+      - NODE_ENV=production
+      - TMDB_ACCESS_TOKEN=${TMDB_ACCESS_TOKEN}
+      - PORT=3000
+    restart: unless-stopped
