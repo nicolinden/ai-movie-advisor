@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, isDevMode } from '@angular/core';
 import { Observable } from 'rxjs';
-import { MovieSearchResponse, MovieDetail } from '../models/movie.model';
+import { MovieSearchResponse, MovieDetail, MovieAnalysis } from '../models/movie.model';
 
 @Injectable({
   providedIn: 'root',
@@ -25,4 +25,10 @@ export class MovieService {
     );
   }
 
+  analyzeMovie(id: number): Observable<MovieAnalysis> {
+    return this.http.post<MovieAnalysis>(
+      `${this.apiBaseUrl}/movies/${id}/analyze`,
+      {}
+    );
+  }
 }

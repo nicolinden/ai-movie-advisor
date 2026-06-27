@@ -3,6 +3,8 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
+import { createMovieAnalysisPrompt } from './services/movie-analysis.prompt.js';
+import { executeJsonPrompt } from './services/openai.service.js';
 import { error } from 'node:console';
 import { title } from 'node:process';
 
@@ -143,6 +145,66 @@ if (process.env.NODE_ENV === 'production') {
         res.sendFile(path.join(frontendPath, 'index.html'));
     });
 }
+
+app.post('/api/movies/:id/analyze', async (req, res) => {
+    try {
+        const movieId = req.params.id;
+        const token = process.env.TMDB_ACCESS_TOKEN;
+
+        if (!token) {
+            return res.status(500).json({
+                error: 'TMDB_ACCESS_TOKEN is not configured',
+            });
+        }
+
+        const url = new URL(`https://api.themoviedb.org/3/movie/${movieId}`);
+        url.searchParams.set('language', 'en-US');
+
+        const response = await fetch(url, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                accept: 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            return res.status(502).json({
+                error: 'Movie provider failed',
+                provider: 'TMDb',
+                providerStatus: response.status,
+            });
+        }
+
+        const movie: any = await response.json();
+
+        const movieDetail = {
+            id: movie.id,
+            title: movie.title,
+            releaseDate: movie.release_date,
+            rating: movie.vote_average,
+            posterUrl: movie.poster_path
+                ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
+                : null,
+            backdropUrl: movie.backdrop_path
+                ? `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`
+                : null,
+            overview: movie.overview,
+            runtime: movie.runtime ?? null,
+            genres: movie.genres?.map((genre: any) => genre.name) ?? [],
+        };
+
+        const prompt = createMovieAnalysisPrompt(movieDetail);
+        const analysis = await executeJsonPrompt(prompt);
+
+        res.json(analysis);
+    } catch (error) {
+        console.error('Movie analysis failed:', error);
+
+        res.status(500).json({
+            error: 'Movie analysis failed',
+        });
+    }
+})
 
 app.listen(port, () => {
     console.log(`Backend running on http://localhost:${port}`);

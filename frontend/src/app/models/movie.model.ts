@@ -23,3 +23,12 @@ export interface MovieDetail {
     runtime: number | null;
     genres: string[];
 }
+
+export interface MovieAnalysis {
+    summary: string;
+    suitableFor: string[];
+    notSuitableFor: string[];
+    mood: string;
+    complexity: 'Low' | 'Medium' | 'High';
+    whyWatch: string;
+}

@@ -21,4 +21,38 @@
   </p>
 
   <p>{{ movie()?.overview }}</p>
+
+  <button type="button" (click)="analyzeMovie()" [disabled]="isAnalyzing()">
+    {{ isAnalyzing() ? 'Analyzing...' : 'Analyze with AI' }}
+  </button>
+
+  @if (analysisError()) {
+    <p class="error">{{ analysisError() }}</p>
+  }
+
+  @if (analysis()) {
+    <section class="analysis">
+      <h2>AI Analysis</h2>
+
+      <p>{{ analysis()?.summary }}</p>
+
+      <h3>Suitable for</h3>
+      <ul>
+        @for (item of analysis()?.suitableFor; track item) {
+          <li>{{ item }}</li>
+        }
+      </ul>
+
+      <h3>Not suitable for</h3>
+      <ul>
+        @for (item of analysis()?.notSuitableFor; track item) {
+          <li>{{ item }}</li>
+        }
+      </ul>
+
+      <p><strong>Mood:</strong> {{ analysis()?.mood }}</p>
+      <p><strong>Complexity:</strong> {{ analysis()?.complexity }}</p>
+      <p><strong>Why watch:</strong> {{ analysis()?.whyWatch }}</p>
+    </section>
+  }
 }
