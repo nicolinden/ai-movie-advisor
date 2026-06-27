@@ -12,6 +12,8 @@ COPY frontend ./frontend
 COPY backend ./backend
 
 RUN cd frontend && npm run build
+RUN cd backend && npm run build
+
 RUN mkdir -p backend/public
 RUN cp -r frontend/dist/ai-movie-advisor-frontend/browser/* backend/public/
 
