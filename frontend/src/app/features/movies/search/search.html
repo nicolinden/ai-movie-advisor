@@ -21,15 +21,17 @@
 <ul>
   @for (movie of movies(); track movie.id) {
     <li>
-      @if (movie.posterUrl) {
-        <img [src]="movie.posterUrl" [alt]="movie.title" />
-      }
+      <a [routerLink]="['/movies', movie.id]">
+        @if (movie.posterUrl) {
+          <img [src]="movie.posterUrl" [alt]="movie.title" />
+        }
 
-      <div>
-        <h2>{{ movie.title }}</h2>
-        <p>{{ movie.releaseDate }} · ⭐ {{ movie.rating }}</p>
-        <p>{{ movie.overview }}</p>
-      </div>
+        <div>
+          <h2>{{ movie.title }}</h2>
+          <p>{{ movie.releaseDate }} · ⭐ {{ movie.rating }}</p>
+          <p>{{ movie.overview }}</p>
+        </div>
+      </a>
     </li>
   }
 </ul>

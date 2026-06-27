@@ -1,0 +1,24 @@
+@if (isLoading()) {
+  <p>Loading movie...</p>
+} @else if (errorMessage()) {
+  <a routerLink="/">← Back to search</a>
+  <p class="error">{{ errorMessage() }}</p>
+} @else if (movie()) {
+  <a routerLink="/">← Back to search</a>
+
+  @if (movie()?.backdropUrl) {
+    <img class="backdrop" [src]="movie()?.backdropUrl" [alt]="movie()?.title" />
+  }
+
+  <h1>{{ movie()?.title }}</h1>
+
+  <p>{{ movie()?.releaseDate }} · {{ movie()?.runtime }} min · ⭐ {{ movie()?.rating }}</p>
+
+  <p>
+    @for (genre of movie()?.genres; track genre) {
+      <span class="genre">{{ genre }}</span>
+    }
+  </p>
+
+  <p>{{ movie()?.overview }}</p>
+}

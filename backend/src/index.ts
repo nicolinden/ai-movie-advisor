@@ -97,8 +97,17 @@ app.get('/api/movies/:id', async (req, res) => {
     });
 
     if (!response.ok) {
+        const errorBody = await response.text();
+
+        console.error('TMDb movie detail request failed', {
+            movieId,
+            status: response.status,
+            body: errorBody,
+        });
+
         return res.status(response.status).json({
             error: 'TMDb movie detail request failed',
+            status: response.status,
         });
     }
 

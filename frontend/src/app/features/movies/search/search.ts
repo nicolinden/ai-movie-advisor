@@ -1,10 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { MovieService } from '../../../services/movie.service';
 import { MovieSearchResult } from '../../../models/movie.model';
 
 @Component({
   selector: 'app-search',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './search.html',
   styleUrl: './search.scss',
 })
