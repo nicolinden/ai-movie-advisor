@@ -1,4 +1,5 @@
 import { MovieDetail, MovieSearchResponse } from "../models/movie.model.js";
+import { TmdbMovieDetailResponse, TmdbMovieSearchResponse } from "../models/tmdb.model.js";
 
 function getTmdbToken(): string {
     const token = process.env.TMDB_ACCESS_TOKEN
@@ -31,9 +32,9 @@ export async function searchMovies(query: string): Promise<MovieSearchResponse> 
         throw new Error(`TMDb search failed with status ${response.status}`);
     }
 
-    const data: any = await response.json();
+    const data = await response.json() as TmdbMovieSearchResponse;
 
-    const movies = data.results.map((movie: any) => ({
+    const movies = data.results.map((movie) => ({
         id: movie.id,
         title: movie.title,
         releaseDate: movie.release_date,
@@ -70,13 +71,13 @@ export async function getMovieDetail(movieId: string): Promise<MovieDetail> {
         throw new Error(`TMDb movie detail failed with status ${response.status}`);
     }
 
-    const movie: any = await response.json();
+    const movie = await response.json() as TmdbMovieDetailResponse;
 
     return {
         id: movie.id,
         title: movie.title,
         releaseDate: movie.release_date,
-        rating: movie.rating,
+        rating: movie.vote_average,
         posterUrl: movie.poster_path
             ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
             : null,
@@ -85,6 +86,6 @@ export async function getMovieDetail(movieId: string): Promise<MovieDetail> {
             : null,
         overview: movie.overview,
         runtime: movie.runtime ?? null,
-        genres: movie.genres?.map((genre: any) => genre.name) ?? [],
+        genres: movie.genres?.map((genre) => genre.name) ?? [],
     };
 }
