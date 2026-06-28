@@ -1,37 +1,76 @@
-<h1>AI Movie Advisor</h1>
+<section class="space-y-8">
+  <header class="space-y-3">
+    <p class="text-sm font-medium uppercase tracking-widest text-blue-400">AI Movie Advisor</p>
 
-<p>Find your next movie with AI.</p>
+    <h1 class="max-w-3xl text-4xl font-bold tracking-tight text-white md:text-5xl">
+      Find your next movie with AI.
+    </h1>
 
-<input
-  type="text"
-  placeholder="Search for a movie..."
-  [value]="searchQuery()"
-  (input)="searchQuery.set($any($event.target).value)"
-  (keydown.enter)="searchMovies()"
-/>
+    <p class="max-w-2xl text-slate-400">
+      Search for a movie, open the details and let AI explain whether it fits your taste.
+    </p>
+  </header>
 
-<button type="button" (click)="searchMovies()" [disabled]="isLoading()">
-  {{ isLoading() ? 'Searching...' : 'Search' }}
-</button>
+  <div
+    class="flex max-w-2xl flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-xl shadow-black/20 sm:flex-row"
+  >
+    <input
+      class="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
+      type="text"
+      placeholder="Search for a movie..."
+      [value]="searchQuery()"
+      (input)="searchQuery.set($any($event.target).value)"
+      (keydown.enter)="searchMovies()"
+    />
 
-@if (errorMessage()) {
-  <p class="error">{{ errorMessage() }}</p>
-}
+    <button
+      class="rounded-xl bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+      type="button"
+      (click)="searchMovies()"
+      [disabled]="isLoading()"
+    >
+      {{ isLoading() ? 'Searching...' : 'Search' }}
+    </button>
+  </div>
 
-<ul>
-  @for (movie of movies(); track movie.id) {
-    <li>
-      <a [routerLink]="['/movies', movie.id]">
-        @if (movie.posterUrl) {
-          <img [src]="movie.posterUrl" [alt]="movie.title" />
-        }
-
-        <div>
-          <h2>{{ movie.title }}</h2>
-          <p>{{ movie.releaseDate }} · ⭐ {{ movie.rating }}</p>
-          <p>{{ movie.overview }}</p>
-        </div>
-      </a>
-    </li>
+  @if (errorMessage()) {
+    <p class="rounded-xl border border-red-900/60 bg-red-950/50 px-4 py-3 text-red-300">
+      {{ errorMessage() }}
+    </p>
   }
-</ul>
+
+  @if (movies().length > 0) {
+    <ul class="grid gap-4">
+      @for (movie of movies(); track movie.id) {
+        <li>
+          <a
+            class="group flex gap-4 rounded-2xl border border-slate-800 bg-slate-900/70 p-4 transition hover:border-blue-500/60 hover:bg-slate-900"
+            [routerLink]="['/movies', movie.id]"
+          >
+            @if (movie.posterUrl) {
+              <img
+                class="h-36 w-24 shrink-0 rounded-xl object-cover"
+                [src]="movie.posterUrl"
+                [alt]="movie.title"
+              />
+            }
+
+            <div class="space-y-2">
+              <h2 class="text-xl font-semibold text-white group-hover:text-blue-300">
+                {{ movie.title }}
+              </h2>
+
+              <p class="text-sm text-slate-400">
+                {{ movie.releaseDate || 'Unknown release date' }} · ⭐ {{ movie.rating }}
+              </p>
+
+              <p class="line-clamp-3 text-slate-300">
+                {{ movie.overview }}
+              </p>
+            </div>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</section>
