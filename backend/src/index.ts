@@ -4,8 +4,9 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 
-import { createMovieAnalysisPrompt } from './prompts/movie-analysis.prompt.js';
 import { executeJsonPrompt } from './services/openai.service.js';
+import { getMovieDetail, searchMovies } from './services/tmdb.service.js';
+import { createMovieAnalysisPrompt } from './prompts/movie-analysis.prompt.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,169 +25,42 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.get('/api/movies/search', async (req, res) => {
-    const query = req.query.query;
+    try {
+        const query = req.query.query;
 
-    if (!query || typeof query !== 'string') {
-        return res.status(400).json({
-            error: 'Valid query parameter is required',
+        if (!query || typeof query !== 'string') {
+            return res.status(400).json({
+                error: 'Valid query parameter is required',
+            });
+        }
+
+        const result = await searchMovies(query);
+        res.json(result);
+    } catch (error) {
+        console.error('Movie search failed:', error);
+
+        res.status(502).json({
+            error: 'Movie provider failed',
         });
     }
-
-    const token = process.env.TMDB_ACCESS_TOKEN;
-
-    if (!token) {
-        return res.status(500).json({
-            error: 'TMDB_ACCESS_TOKEN is not configured',
-        });
-    }
-
-    const url = new URL('https://api.themoviedb.org/3/search/movie');
-    url.searchParams.set('query', query);
-    url.searchParams.set('language', 'en-US');
-    url.searchParams.set('include_adult', 'false');
-
-    const response = await fetch(url, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-            accept: 'application/json',
-        },
-    });
-
-    if (!response.ok) {
-        return res.status(response.status).json({
-            error: 'TMDb request failed',
-        });
-    }
-
-    const data: any = await response.json();
-
-    const movies = data.results.map((movie: any) => ({
-        id: movie.id,
-        title: movie.title,
-        releaseDate: movie.release_date,
-        rating: movie.vote_average,
-        posterUrl: movie.poster_path
-            ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
-            : null,
-        overview: movie.overview,
-    }));
-
-    res.json({
-        query,
-        results: movies,
-    });
 });
 
 app.get('/api/movies/:id', async (req, res) => {
-    const movieId = req.params.id;
-    const token = process.env.TMDB_ACCESS_TOKEN;
+    try {
+        const movie = await getMovieDetail(req.params.id);
+        res.json(movie);
+    } catch (error) {
+        console.error('Movie detail failed:', error);
 
-    if (!token) {
-        return res.status(500).json({
-            error: 'TMDB_ACCESS_TOKEN is not configured',
-        });
-    }
-
-    const url = new URL(`https://api.themoviedb.org/3/movie/${movieId}`);
-    url.searchParams.set('language', 'en-US');
-
-    const response = await fetch(url, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-            accept: 'application/json',
-        },
-    });
-
-    if (!response.ok) {
-        const errorBody = await response.text();
-
-        console.error('TMDb movie detail request failed', {
-            movieId,
-            status: response.status,
-            body: errorBody,
-        });
-
-        return res.status(502).json({
+        res.status(502).json({
             error: 'Movie provider failed',
-            provider: 'TMDb',
-            providerStatus: response.status,
         });
     }
-
-    const movie: any = await response.json();
-
-    res.json({
-        id: movie.id,
-        title: movie.title,
-        releaseDate: movie.release_date,
-        rating: movie.vote_average,
-        posterUrl: movie.poster_path
-            ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
-            : null,
-        backdropUrl: movie.backdrop_path
-            ? `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`
-            : null,
-        overview: movie.overview,
-        runtime: movie.runtime ?? null,
-        genres: movie.genres?.map((genre: any) => genre.name) ?? [],
-    });
 });
 
 app.post('/api/movies/:id/analyze', async (req, res) => {
     try {
-        const movieId = req.params.id;
-        const token = process.env.TMDB_ACCESS_TOKEN;
-
-        if (!token) {
-            return res.status(500).json({
-                error: 'TMDB_ACCESS_TOKEN is not configured',
-            });
-        }
-
-        const url = new URL(`https://api.themoviedb.org/3/movie/${movieId}`);
-        url.searchParams.set('language', 'en-US');
-
-        const response = await fetch(url, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                accept: 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            const errorBody = await response.text();
-
-            console.error('TMDb movie detail request failed for analysis', {
-                movieId,
-                status: response.status,
-                body: errorBody,
-            });
-
-            return res.status(502).json({
-                error: 'Movie provider failed',
-                provider: 'TMDb',
-                providerStatus: response.status,
-            });
-        }
-
-        const movie: any = await response.json();
-
-        const movieDetail = {
-            id: movie.id,
-            title: movie.title,
-            releaseDate: movie.release_date,
-            rating: movie.vote_average,
-            posterUrl: movie.poster_path
-                ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
-                : null,
-            backdropUrl: movie.backdrop_path
-                ? `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`
-                : null,
-            overview: movie.overview,
-            runtime: movie.runtime ?? null,
-            genres: movie.genres?.map((genre: any) => genre.name) ?? [],
-        };
-
+        const movieDetail = await getMovieDetail(req.params.id);
         const prompt = createMovieAnalysisPrompt(movieDetail);
         const analysis = await executeJsonPrompt(prompt);
 
