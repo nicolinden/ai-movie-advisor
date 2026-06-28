@@ -7,6 +7,7 @@ import 'dotenv/config';
 import { executeJsonPrompt } from './services/openai.service.js';
 import { getMovieDetail, searchMovies } from './services/tmdb.service.js';
 import { createMovieAnalysisPrompt } from './prompts/movie-analysis.prompt.js';
+import { movieAnalysisSchema } from './schemas/movie-analysis.schema.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -62,7 +63,11 @@ app.post('/api/movies/:id/analyze', async (req, res) => {
     try {
         const movieDetail = await getMovieDetail(req.params.id);
         const prompt = createMovieAnalysisPrompt(movieDetail);
-        const analysis = await executeJsonPrompt(prompt);
+        const analysis = await executeJsonPrompt(
+            prompt,
+            movieAnalysisSchema,
+            'movie_analysis'
+        );
 
         res.json(analysis);
     } catch (error) {

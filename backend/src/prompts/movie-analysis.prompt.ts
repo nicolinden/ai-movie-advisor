@@ -10,10 +10,12 @@ type MovieAnalysisInput = {
 export function createMovieAnalysisPrompt(movie: MovieAnalysisInput): string {
     return `
         You are an expert movie advisor. 
+        
         Analyze this movie for someone deciding wheter to watch it.
 
-        Movie 
+        Use only the provided movie data. Do not invent awars, actors, directors, reviews, plot details or production facts that are not included below.
 
+        Movie 
         Title: ${movie.title}
         Release date: ${movie.releaseDate}
         Rating: ${movie.rating}
@@ -21,24 +23,12 @@ export function createMovieAnalysisPrompt(movie: MovieAnalysisInput): string {
         Genres: ${movie.genres.join(', ')}
         Overview: ${movie.overview}
 
-        Return ONLY valid JSON.
+        Focus on practical viewing advice:
+        - What kind of viewer would enjoy this movie?
+        - What kind of viewer might not enjoy it?
+        - What is the likely mood or viewing experience?
+        - How mentally demanding is it
 
-        The JSON MUST exactly match this structure:
-
-        {
-            "summary": "string",
-            "suitableFor": ["string"],
-            "notSuitableFor": ["string"],
-            "mood": "string",
-            "complexity": "Low | Medium | High",
-            "whyWatch": "string"
-        }
-
-        Rules:
-        - Do not return markdown.
-        - Do not wrap the JSON in code fences.
-        - Do not add additional fields.
-        - Do not omit fields.
-        - Do not invent facts that are not supported by the provided movie data.
-    `;
+        Return the analysis using the provided structured output schema.
+        `;
 }

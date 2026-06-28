@@ -10,13 +10,20 @@ export const openai = new OpenAI({
     apiKey,
 });
 
-export async function executeJsonPrompt<T>(prompt: string): Promise<T> {
+export async function executeJsonPrompt<T>(
+    prompt: string,
+    schema: Record<string, unknown>,
+    schemaName: string
+): Promise<T> {
     const response = await openai.responses.create({
         model: 'gpt-4.1-mini',
         input: prompt,
         text: {
             format: {
-                type: 'json_object',
+                type: 'json_schema',
+                name: schemaName,
+                strict: true,
+                schema,
             },
         },
     });
