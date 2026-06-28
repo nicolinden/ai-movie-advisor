@@ -2,10 +2,12 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MovieService } from '../../../services/movie.service';
 import { MovieAnalysis, MovieDetail } from '../../../models/movie.model';
+import { AiAnalysisCard } from '../components/ai-analysis-card/ai-analysis-card';
+import { MovieHero } from '../components/movie-hero/movie-hero';
 
 @Component({
   selector: 'app-detail',
-  imports: [RouterLink],
+  imports: [RouterLink, AiAnalysisCard, MovieHero],
   templateUrl: './detail.html',
   styleUrl: './detail.scss',
 })

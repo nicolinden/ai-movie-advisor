@@ -42,34 +42,7 @@
   @if (movies().length > 0) {
     <ul class="grid gap-4">
       @for (movie of movies(); track movie.id) {
-        <li>
-          <a
-            class="group flex gap-4 rounded-2xl border border-slate-800 bg-slate-900/70 p-4 transition hover:border-blue-500/60 hover:bg-slate-900"
-            [routerLink]="['/movies', movie.id]"
-          >
-            @if (movie.posterUrl) {
-              <img
-                class="h-36 w-24 shrink-0 rounded-xl object-cover"
-                [src]="movie.posterUrl"
-                [alt]="movie.title"
-              />
-            }
-
-            <div class="space-y-2">
-              <h2 class="text-xl font-semibold text-white group-hover:text-blue-300">
-                {{ movie.title }}
-              </h2>
-
-              <p class="text-sm text-slate-400">
-                {{ movie.releaseDate || 'Unknown release date' }} · ⭐ {{ movie.rating }}
-              </p>
-
-              <p class="line-clamp-3 text-slate-300">
-                {{ movie.overview }}
-              </p>
-            </div>
-          </a>
-        </li>
+        <li><app-movie-card [movie]="movie" /></li>
       }
     </ul>
   }

@@ -1,0 +1,52 @@
+<section class="rounded-3xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-black/20">
+  <div class="mb-6">
+    <p class="text-sm font-medium uppercase tracking-widest text-blue-400">AI Analysis</p>
+
+    <h2 class="mt-2 text-2xl font-bold text-white">Should you watch this?</h2>
+  </div>
+
+  <div class="space-y-6">
+    <p class="text-lg leading-8 text-slate-300">
+      {{ analysis().summary }}
+    </p>
+
+    <div class="grid gap-4 md:grid-cols-2">
+      <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+        <h3 class="mb-3 font-semibold text-green-300">Suitable for</h3>
+
+        <ul class="space-y-2 text-slate-300">
+          @for (item of analysis().suitableFor; track item) {
+            <li>✓ {{ item }}</li>
+          }
+        </ul>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+        <h3 class="mb-3 font-semibold text-red-300">Not suitable for</h3>
+
+        <ul class="space-y-2 text-slate-300">
+          @for (item of analysis().notSuitableFor; track item) {
+            <li>× {{ item }}</li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-3">
+      <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+        <p class="text-sm text-slate-500">Mood</p>
+        <p class="mt-1 font-medium text-white">{{ analysis().mood }}</p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+        <p class="text-sm text-slate-500">Complexity</p>
+        <p class="mt-1 font-medium text-white">{{ analysis().complexity }}</p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 md:col-span-1">
+        <p class="text-sm text-slate-500">Why watch</p>
+        <p class="mt-1 text-slate-300">{{ analysis().whyWatch }}</p>
+      </div>
+    </div>
+  </div>
+</section>
