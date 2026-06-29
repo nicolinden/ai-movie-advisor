@@ -17,11 +17,22 @@ export interface MovieDetail {
     title: string;
     releaseDate: string;
     rating: number;
-    posterUrl: string | null;
-    backdropUrl: string | null;
-    overview: string;
+    voteCount: number;
     runtime: number | null;
     genres: string[];
+    overview: string;
+
+    posterUrl: string | null;
+    backdropUrl: string | null;
+
+    directors: string[];
+    writers: string[];
+    topCast: string[];
+    keywords: string[];
+    certification: string | null;
+
+    originalLanguage: string;
+    productionCountries: string[];
 }
 
 export interface MovieAnalysis {
@@ -30,5 +41,8 @@ export interface MovieAnalysis {
     notSuitableFor: string[];
     mood: string;
     complexity: 'Low' | 'Medium' | 'High';
+    highlights: string[];
+    caveats: string[];
+    bestMomentToWatch: string;
     whyWatch: string;
 }

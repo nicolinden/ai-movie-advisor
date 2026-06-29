@@ -16,11 +16,56 @@ export interface TmdbMovieDetailResponse {
     title: string;
     release_date: string;
     vote_average: number;
-    poster_path: string | null;
-    backdrop_path: string | null;
-    overview: string;
+    vote_count: number;
     runtime: number | null;
     genres: TmdbGenre[];
+    overview: string;
+    poster_path: string | null;
+    backdrop_path: string | null;
+    original_language: string;
+    production_countries: TmdbProductionCountry[];
+}
+
+export interface TmdbProductionCountry {
+    iso_3166_1: string;
+    name: string;
+}
+
+export interface TmdbCreditsResponse {
+    cast: TmdbCastMember[];
+    crew: TmdbCrewMember[];
+}
+
+export interface TmdbCastMember {
+    name: string;
+    order: number;
+}
+
+export interface TmdbCrewMember {
+    name: string;
+    job: string;
+}
+
+export interface TmdbKeywordsResponse {
+    keywords: TmdbKeyword[];
+}
+
+export interface TmdbKeyword {
+    id: number;
+    name: string;
+}
+
+export interface TmdbReleaseDatesResponse {
+    results: TmdbReleaseCountry[];
+}
+
+export interface TmdbReleaseCountry {
+    iso_3166_1: string;
+    release_dates: TmdbReleaseDate[];
+}
+
+export interface TmdbReleaseDate {
+    certification: string;
 }
 
 export interface TmdbGenre {

@@ -30,5 +30,8 @@ export interface MovieAnalysis {
     notSuitableFor: string[];
     mood: string;
     complexity: 'Low' | 'Medium' | 'High';
+    highlights: string[];
+    caveats: string[];
+    bestMomentToWatch: string;
     whyWatch: string;
 }

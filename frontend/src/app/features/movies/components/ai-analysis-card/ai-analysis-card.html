@@ -32,6 +32,29 @@
       </div>
     </div>
 
+    <div class="grid gap-6 md:grid-cols-2">
+      <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+        <h3 class="mb-3 font-semibold text-blue-300">Highlights</h3>
+        
+        <ul class="space-y-2 text-slate-300">
+          @for(item of analysis().highlights; track item) {
+            <li>★ {{ item }}</li>
+          }
+        </ul>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+        <h3 class="mb-3 font-semibold text-yellow-300">Things to know</h3>
+
+        <ul class="space-y-2 text-slate-300">
+          @for (item of analysis().caveats; track item) {
+            <li>⚠ {{ item }}</li>
+          }
+        </ul>
+
+      </div>
+    </div>
+
     <div class="grid gap-4 md:grid-cols-3">
       <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
         <p class="text-sm text-slate-500">Mood</p>
@@ -40,13 +63,36 @@
 
       <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
         <p class="text-sm text-slate-500">Complexity</p>
-        <p class="mt-1 font-medium text-white">{{ analysis().complexity }}</p>
+
+        @switch (analysis().complexity) {
+          @case ('Low') {
+            <p class="mt-1 font-medium text-green-300">Low</p>
+            <p class="mt-2 text-sm text-slate-400">Easy to follow. Suitable for casual viewing.</p>
+          }
+
+          @case ('Medium') {
+            <p class="mt-1 font-medium text-yellow-300">Medium</p>
+            <p class="mt-2 text-sm text-slate-400">Requires normal attention.</p>
+
+          }
+
+          @case ('High') {
+            <p class="mt-1 font-medium text-red-300">High</p>
+            <p class="mt-2 text-sm text-slate-400">Requires full attention because of complex storytelling, themes or concepts.</p>            
+          }
+        }
       </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 md:col-span-1">
+        <p class="text-sm text-slate-500">Best moment to watch</p>
+        <p class="mt-1 text-slate-300">{{ analysis().bestMomentToWatch }}</p>
+      </div>      
+
+    </div>
 
       <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 md:col-span-1">
         <p class="text-sm text-slate-500">Why watch</p>
         <p class="mt-1 text-slate-300">{{ analysis().whyWatch }}</p>
       </div>
-    </div>
   </div>
 </section>
