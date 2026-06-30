@@ -1,5 +1,3 @@
-import { title } from "node:process";
-import { MovieRecommendationResponse } from "../models/movie-recommendation.model.js";
 import { MovieDetail, MovieSearchResponse } from "../models/movie.model.js";
 import { TmdbCreditsResponse, TmdbGenresResponse, TmdbKeywordsResponse, TmdbMovieDetailResponse, TmdbMovieSearchResponse, TmdbReleaseDatesResponse, TmdSimilarMoviesResponse } from "../models/tmdb.model.js";
 import { RecommendationCandidate } from "../prompts/movie-recommendations.prompt.js";
@@ -107,7 +105,7 @@ export async function searchMovies(query: string): Promise<MovieSearchResponse> 
 }
 
 export async function getMovieDetail(movieId: string): Promise<MovieDetail> {
-    const url = new URL(`${baseUrl}/${movieId}`);
+    const url = new URL(`${baseUrl}/movie/${movieId}`);
     url.searchParams.set('language', 'en-US');
 
     const [movie, credits, keywords, releaseDates] = await Promise.all([
@@ -160,7 +158,7 @@ export async function getMovieDetail(movieId: string): Promise<MovieDetail> {
     };
 }
 
-export async function getRecommendationCandidate(movieId: string): Promise<RecommendationCandidate[]> {
+export async function getRecommendationsCandidate(movieId: string): Promise<RecommendationCandidate[]> {
     const [similarMoviesResponse, genres] = await Promise.all([
         getSimilarMovies(movieId),
         getMovieGenres(),
@@ -175,6 +173,9 @@ export async function getRecommendationCandidate(movieId: string): Promise<Recom
         .map((movie) => ({
             id: movie.id,
             title: movie.title,
+            posterUrl: movie.poster_path
+                ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
+                : null,
             releaseDate: movie.release_date,
             rating: movie.vote_average,
             overview: movie.overview,

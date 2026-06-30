@@ -1,7 +1,7 @@
 export interface MovieRecommendation {
     id: number;
     title: string;
-    posterUrl: string
+    posterUrl: string | null;
     releaseDate: string;
     rating: number;
     reason: string;

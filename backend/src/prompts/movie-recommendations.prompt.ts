@@ -3,6 +3,7 @@ import { MovieDetail } from "../models/movie.model.js";
 export type RecommendationCandidate = {
     id: number;
     title: string;
+    posterUrl: string | null;
     releaseDate: string;
     rating: number;
     genres: string[];
