@@ -72,3 +72,23 @@ export interface TmdbGenre {
     id: number;
     name: string;
 }
+
+export interface TmdSimilarMoviesResponse {
+    results: TmdbSimilarMovie[];
+}
+
+export interface TmdbSimilarMovie {
+    id: number;
+    adult: boolean;
+    genre_ids: number[];
+    title: string;
+    vote_average: number;
+    vote_count: number;
+    overview: string;
+    poster_path: string | null;
+    release_date: string;
+}
+
+export interface TmdbGenresResponse {
+    genres: TmdbGenre[];
+}
