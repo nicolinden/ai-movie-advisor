@@ -71,6 +71,25 @@ async function getSimilarMovies(movieId: string): Promise<TmdSimilarMoviesRespon
     return fetchFromTmdb<TmdSimilarMoviesResponse>(url);
 }
 
+async function getTmdbRecommendedMovies(movieId: string): Promise<TmdSimilarMoviesResponse> {
+    const url = new URL(`${baseUrl}/movie/${movieId}/recommendations`);
+    url.searchParams.set('language', 'en-US');
+    return fetchFromTmdb<TmdSimilarMoviesResponse>(url);
+}
+
+async function discoverMoviesByKeywords(
+    keywordIds: number[],
+): Promise<TmdSimilarMoviesResponse> {
+    const url = new URL(`${baseUrl}/discover/movie`);
+    url.searchParams.set('language', 'en-US');
+    url.searchParams.set('with_keywords', keywordIds.join('|'));
+    url.searchParams.set('vote_count.gte', '500');
+    url.searchParams.set('vote_average.gte', '6');
+    url.searchParams.set('sort_by', 'vote_count.desc');
+
+    return fetchFromTmdb<TmdSimilarMoviesResponse>(url);
+}
+
 export async function searchMovies(query: string): Promise<MovieSearchResponse> {
     const url = new URL('https://api.themoviedb.org/3/search/movie');
     url.searchParams.set('query', query);
@@ -159,8 +178,10 @@ export async function getMovieDetail(movieId: string): Promise<MovieDetail> {
 }
 
 export async function getRecommendationsCandidate(movieId: string): Promise<RecommendationCandidate[]> {
-    const [similarMoviesResponse, genres] = await Promise.all([
+    const [similarMoviesResponse, recommendedMoviesResponse, keywords, genres] = await Promise.all([
         getSimilarMovies(movieId),
+        getTmdbRecommendedMovies(movieId),
+        getMovieKeywords(movieId),
         getMovieGenres(),
     ]);
 
@@ -168,7 +189,33 @@ export async function getRecommendationsCandidate(movieId: string): Promise<Reco
         genres.genres.map((genre) => [genre.id, genre.name])
     );
 
-    return similarMoviesResponse.results
+    const keywordIds = keywords.keywords
+        .slice(0, 6)
+        .map((keyword) => keyword.id)
+
+    const keywordMovieResponse = keywordIds.length > 0
+        ? await discoverMoviesByKeywords(keywordIds)
+        : { results: [] };
+
+    const combinedMovies = [
+        ...recommendedMoviesResponse.results,
+        ...keywordMovieResponse.results,
+        ...similarMoviesResponse.results,
+    ];
+
+    const uniqueMovies = combinedMovies.filter(
+        (movie, index, movies) => movies.findIndex((item) => item.id === movie.id) === index,
+    )
+
+    const qualityMovies = uniqueMovies.filter(
+        (movie) =>
+            movie.id !== Number(movieId) &&
+            movie.vote_count >= 100 &&
+            movie.vote_average >= 6 &&
+            movie.overview.trim().length > 0,
+    );
+
+    return qualityMovies
         .slice(0, 15)
         .map((movie) => ({
             id: movie.id,

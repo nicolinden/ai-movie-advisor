@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, isDevMode } from '@angular/core';
 import { Observable } from 'rxjs';
-import { MovieSearchResponse, MovieDetail, MovieAnalysis } from '../models/movie.model';
+import { MovieSearchResponse, MovieDetail, MovieAnalysis, MovieRecommendationResponse } from '../models/movie.model';
 
 @Injectable({
   providedIn: 'root',
@@ -31,4 +31,12 @@ export class MovieService {
       {}
     );
   }
+
+  getRecommendations(id: number): Observable<MovieRecommendationResponse> {
+    return this.http.post<MovieRecommendationResponse>(
+      `${this.apiBaseUrl}/movies/${id}/recommendations`,
+      {}
+    );
+  }
+
 }

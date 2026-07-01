@@ -18,10 +18,10 @@
       <button
         class="rounded-xl bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
         type="button"
-        (click)="analyzeMovie()"
-        [disabled]="isAnalyzing()"
+        (click)="generateAiAdvice()"
+        [disabled]="isAnalyzing() || isLoadingRecommendations()"
       >
-        {{ isAnalyzing() ? 'Analyzing...' : 'Analyze with AI' }}
+        {{ isAnalyzing() || isLoadingRecommendations() ? 'Generating...' : 'Generate AI advice' }}
       </button>
 
       @if (analysisError()) {
@@ -31,10 +31,20 @@
           {{ analysisError() }}
         </p>
       }
+
+      @if (recommendationsError()) {
+        <p class="max-w-3xl rounded-xl border border-red-900/60 bg-red-950/50 px-4 py-3 text-red-300">
+          {{ recommendationsError() }}
+        </p>
+      }
     </div>
 
     @if (analysis(); as movieAnalysis) {
       <app-ai-analysis-card [analysis]="movieAnalysis" />
+    }
+
+    @if(recommendations()) {
+      <app-movie-recommendations [recommendations]="recommendations()!" class="mt-6 block" />
     }
   </section>
 }

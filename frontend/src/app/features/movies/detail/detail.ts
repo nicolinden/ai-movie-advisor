@@ -1,13 +1,14 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MovieService } from '../../../services/movie.service';
-import { MovieAnalysis, MovieDetail } from '../../../models/movie.model';
+import { MovieAnalysis, MovieDetail, MovieRecommendation } from '../../../models/movie.model';
 import { AiAnalysisCard } from '../components/ai-analysis-card/ai-analysis-card';
 import { MovieHero } from '../components/movie-hero/movie-hero';
+import { MovieRecommendations } from '../components/movie-recommendations/movie-recommendations';
 
 @Component({
   selector: 'app-detail',
-  imports: [RouterLink, AiAnalysisCard, MovieHero],
+  imports: [RouterLink, AiAnalysisCard, MovieHero, MovieRecommendations],
   templateUrl: './detail.html',
   styleUrl: './detail.scss',
 })
@@ -23,7 +24,17 @@ export class Detail implements OnInit {
   protected readonly isAnalyzing = signal(false);
   protected readonly analysisError = signal<string | null>(null);
 
-  protected analyzeMovie(): void {
+  protected readonly recommendations = signal<MovieRecommendation[] | null>(null);
+  protected readonly isLoadingRecommendations = signal(false);
+  protected readonly recommendationsError = signal<string | null>(null);
+
+
+  protected generateAiAdvice(): void {
+    this.analyzeMovie();
+    this.getRecommendations();
+  }
+
+  private analyzeMovie(): void {
     const movie = this.movie();
 
     if (!movie) {
@@ -45,18 +56,57 @@ export class Detail implements OnInit {
     })
   }
 
-  ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+  private getRecommendations(): void {
+    const movie = this.movie();
 
-    this.movieService.getMovieDetail(id).subscribe({
-      next: (movie) => {
-        this.movie.set(movie);
-        this.isLoading.set(false);
+    if (!movie) return;
+
+    this.isLoadingRecommendations.set(true);
+    this.recommendationsError.set(null);
+
+    this.movieService.getRecommendations(movie.id).subscribe({
+      next: (results) => {
+        this.recommendations.set(results.recommendations);
+        this.isLoadingRecommendations.set(false);
       },
       error: () => {
-        this.errorMessage.set('Could not load movie detail.');
-        this.isLoading.set(false);
-      },
-    })
+        this.recommendationsError.set('Could not load movie recommendations');
+        this.isLoadingRecommendations.set(false);
+      }
+    });
+  }
+
+  private resetMovieState() {
+    this.movie.set(null);
+    this.errorMessage.set(null);
+    this.isLoading.set(true);
+
+    this.analysis.set(null);
+    this.analysisError.set(null);
+    this.isAnalyzing.set(false);
+
+    this.recommendations.set(null);
+    this.recommendationsError.set(null);
+    this.isLoadingRecommendations.set(false);
+  }
+
+  ngOnInit(): void {
+    this.route.paramMap.subscribe((params) => {
+      const id = Number(params.get('id'));
+
+      this.resetMovieState();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      this.movieService.getMovieDetail(id).subscribe({
+        next: (movie) => {
+          this.movie.set(movie);
+          this.isLoading.set(false);
+        },
+        error: () => {
+          this.errorMessage.set('Could not load movie detail.');
+          this.isLoading.set(false);
+        },
+      })
+    });
   }
 }

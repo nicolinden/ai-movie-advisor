@@ -1,0 +1,37 @@
+<section class="rounded-3xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-black/20 space-y-4">
+    
+    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-400">
+        AI RECOMMENDATIONS
+    </p>
+    
+    <h2 class="mt-2 text-3xl font-bold">Recommended for you</h2>
+
+    <p class="text-sm text-slate-400">
+        Based on theme, tone, storytelling and overall viewing experience.
+    </p>
+
+
+
+    @for (recommendation of recommendations(); track recommendation.id) {
+        <article class="flex gap-4 rounded-2xl border border-slate-800 bg-slate-950/60 p-4 transition hover:border-slate-700 hover:bg-slate-950 cursor-pointer" [routerLink]="['/movies', recommendation.id]">
+            @if(recommendation.posterUrl) {
+                <img
+                    class="h-32 w-20 shrink-0 rounded-xl object-cover"
+                    [src]="recommendation.posterUrl" 
+                    [alt]="recommendation.title" />
+            }
+            <div class="min-w-0 flex-1">
+                <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-lg font-semibold">{{ recommendation.title }}</h3>
+                    <span class="shrink-0 rounded-full font-medium" [ngClass]="matchStrengthStyles[recommendation.matchStrength]">
+                        {{ recommendation.matchStrength }} match
+                    </span>
+                </div>
+                <p class="text-sm text-slate-400">  {{ recommendation.releaseDate }} • ★ {{ recommendation.rating | number:'1.1-1' }}</p>
+                <p class="mt-3 leading-6 text-slate-300">{{ recommendation.reason }} </p>
+            </div>
+
+        </article>
+    }
+    
+</section>
