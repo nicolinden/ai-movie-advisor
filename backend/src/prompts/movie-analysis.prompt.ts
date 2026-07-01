@@ -1,3 +1,5 @@
+const OUTPUT_LANGUAGE = 'Dutch';
+
 export type MovieAnalysisInput = {
     title: string;
     releaseDate: string;
@@ -41,6 +43,7 @@ Rules:
 - Do not invent facts, awards, reviews, plot details, actors, directors or production information that are not explicitly provided.
 - Focus on practical viewing advice instead of retelling the plot.
 - Avoid spoilers.
+- Write all user-facing output in ${OUTPUT_LANGUAGE}.
 `;
 }
 

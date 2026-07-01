@@ -1,5 +1,7 @@
 import { MovieDetail } from "../models/movie.model.js";
 
+const OUTPUT_LANGUAGE = 'Dutch';
+
 export type RecommendationCandidate = {
     id: number;
     title: string;
@@ -40,6 +42,7 @@ function createRules(): string {
         - Do not recommend the source movie itself.
         - Do not recommend movies that are not in the candidate list.
         - Do not recommend a movie only because it shares one genre or one actor with the source movie. 
+        - Write all user-facing recommendation text in ${OUTPUT_LANGUAGE}.
     `;
 }
 
