@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { MovieSearchResult } from '../../../../models/movie.model';
+import { SearchResult } from '../../../../models/movie.model';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -9,5 +9,5 @@ import { RouterLink } from '@angular/router';
   styleUrl: './movie-card.scss',
 })
 export class MovieCard {
-  readonly movie = input.required<MovieSearchResult>()
+  readonly movie = input.required<SearchResult>()
 }

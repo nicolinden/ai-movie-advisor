@@ -1,4 +1,4 @@
-export interface MovieSearchResult {
+export interface BaseSearchResult {
     id: number;
     title: string;
     releaseDate: string;
@@ -7,9 +7,22 @@ export interface MovieSearchResult {
     overview: string;
 }
 
+export interface MovieSearchResult extends BaseSearchResult {
+    mediaType: 'movie';
+}
+
+export interface SeriesSearchResult extends BaseSearchResult {
+    mediaType: 'tv';
+}
+
+export type SearchResult = MovieSearchResult | SeriesSearchResult;
+
 export interface MovieSearchResponse {
     query: string;
-    results: MovieSearchResult[];
+    page: number;
+    totalPages: number;
+    totalResults: number;
+    results: SearchResult[];
 }
 
 export interface MovieDetail {

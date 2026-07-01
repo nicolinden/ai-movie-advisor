@@ -13,9 +13,9 @@ export class MovieService {
     ? 'http://localhost:3000/api'
     : '/api';
 
-  searchMovies(query: string): Observable<MovieSearchResponse> {
+  searchMovies(query: string, page = 1): Observable<MovieSearchResponse> {
     return this.http.get<MovieSearchResponse>(
-      `${this.apiBaseUrl}/movies/search?query=${encodeURIComponent(query)}`
+      `${this.apiBaseUrl}/movies/search?query=${encodeURIComponent(query)}&page=${page}`
     );
   }
 
